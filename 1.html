@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Screen Lock</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    .screen-lock {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.9);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 1s ease;
+    }
+
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      width: 1280px;
+      height: 100%;
+      display: flex;
+      gap: 10px;
+    }
+
+    .column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: scrollDown linear infinite;
+    }
+
+    .column img {
+      width: 100px;
+      height: auto;
+      object-fit: cover;
+    }
+
+    .column:nth-child(1) { animation-duration: 10s; }
+    .column:nth-child(2) { animation-duration: 12s; }
+    .column:nth-child(3) { animation-duration: 8s; }
+    .column:nth-child(4) { animation-duration: 15s; }
+    .column:nth-child(5) { animation-duration: 9s; }
+    .column:nth-child(6) { animation-duration: 11s; }
+
+    @keyframes scrollDown {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="screen-lock" id="screenLock">
+  <div class="container" id="imageContainer">
+    <div class="column"></div>
+    <div class="column"></div>
+    <div class="column"></div>
+    <div class="column"></div>
+    <div class="column"></div>
+    <div class="column"></div>
+  </div>
+</div>
+
+<script>
+  const alignments = ['flex-start', 'center', 'flex-end'];
+  const imageURLs = [
+    'img1.png', 'img2.png', 'img3.png', 'img4.png',
+    'img5.png', 'img6.png', 'img7.png', 'img8.png',
+    'img9.png', 'img10.png', 'img11.png', 'img12.png',
+  ];
+
+  // پر کردن ستون‌ها
+  document.querySelectorAll('.column').forEach(column => {
+    for (let i = 0; i < 10; i++) {
+      const img = document.createElement('img');
+      img.src = imageURLs[Math.floor(Math.random() * imageURLs.length)];
+      img.style.alignSelf = alignments[Math.floor(Math.random() * alignments.length)];
+      column.appendChild(img);
+      const clone = img.cloneNode();
+      column.appendChild(clone);
+    }
+  });
+
+  const screenLock = document.getElementById('screenLock');
+  let isUnlocked = false;
+  let timeout;
+
+  function hideLock() {
+    if (!isUnlocked) {
+      isUnlocked = true;
+      screenLock.classList.add('hidden');
+      resetInactivity();
+    }
+  }
+
+  function showLock() {
+    isUnlocked = false;
+    screenLock.classList.remove('hidden');
+  }
+
+  function resetInactivity() {
+    clearTimeout(timeout);
+    timeout = setTimeout(showLock, 15000); // 15 ثانیه
+  }
+
+  // اولین حرکت ماوس باعث محو شدن می‌شود
+  window.addEventListener('mousemove', hideLock);
+
+  // حرکت‌های بعدی فقط تایمر را ریست می‌کنند
+  ['mousemove', 'keydown', 'scroll'].forEach(event => {
+    window.addEventListener(event, resetInactivity);
+  });
+
+  resetInactivity();
+</script>
+
+</body>
+</html>
